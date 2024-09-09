@@ -1,5 +1,6 @@
+import sys
 import polars as pl
-from io_plugin import new_bernoulli, new_uniform, new_fibonacci, scan_random, scan_sequence
+from io_plugin import new_bernoulli, new_uniform, new_fibonacci, new_reader, scan_random, scan_sequence, scan_files
 
 
 lf = scan_random(
@@ -30,6 +31,7 @@ lf = scan_sequence(
     ]
 )
 
+## Don't
 #lf = lf.filter(pl.col("fib_pos") > 10)
 
 print()
@@ -38,3 +40,21 @@ print(lf.head(10).collect())
 print()
 print("lf.head(10).collect():")
 print(lf.head(10).collect())
+
+
+lf = scan_files(
+    [
+        new_reader("lines", sys.argv[1] if len(sys.argv) > 1 else "/dev/null"),
+    ]
+)
+
+#lf = lf.filter(pl.col("fib_pos") > 10)
+
+with pl.Config(
+    fmt_str_lengths=1000,
+    tbl_width_chars=1000,
+    tbl_rows=1000,
+):
+    print()
+    print("lf.head(10).collect():")
+    print(lf.head(10).collect())
