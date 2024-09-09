@@ -1,19 +1,17 @@
+use polars::prelude::*;
+use pyo3::{pyclass, pyfunction};
+use pyo3_polars::export::polars_core::datatypes::DataType;
+use pyo3_polars::export::polars_core::prelude::Series;
 use std::error::Error;
 use std::fs::File;
 use std::io;
 use std::io::BufRead;
 use std::path::Path;
-use polars::prelude::*;
-use pyo3::{pyclass, pyfunction};
-use pyo3_polars::export::polars_core::datatypes::DataType;
-use pyo3_polars::export::polars_core::prelude::Series;
 use std::sync::Mutex;
 
 #[pyclass]
 #[derive(Clone)]
-pub struct PyReader(
-    pub Arc<Mutex<Box<dyn FileReader>>>,
-);
+pub struct PyReader(pub Arc<Mutex<Box<dyn FileReader>>>);
 
 pub trait FileReader: Send {
     fn name(&self) -> &str;
@@ -64,7 +62,7 @@ impl FileReader for LineReader {
                         }
                     }
                 }
-            },
+            }
             Err(e) => {
                 eprintln!("Error opening file: {}", e);
             }
@@ -79,4 +77,3 @@ pub fn new_reader(name: String, filename: String) -> PyReader {
     let res = Box::new(new_line_reader_impl(name, filename)) as Box<dyn FileReader>;
     PyReader(Arc::new(Mutex::new(res)))
 }
-

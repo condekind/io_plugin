@@ -1,14 +1,14 @@
-mod samplers;
 mod fibonacci;
 mod readers;
+mod samplers;
 
-use crate::samplers::PySampler;
 use crate::fibonacci::PySeq;
+use crate::readers::PyReader;
+use crate::samplers::PySampler;
 use polars::prelude::*;
 use pyo3::prelude::*;
 use pyo3_polars::error::PyPolarsErr;
 use pyo3_polars::{PyDataFrame, PyExpr, PySchema};
-use crate::readers::PyReader;
 
 #[pyclass]
 pub struct ReaderSource {
@@ -21,14 +21,9 @@ pub struct ReaderSource {
 
 #[pymethods]
 impl ReaderSource {
-
     #[new]
     #[pyo3(signature = (columns, size_hint, n_rows))]
-    fn new_source(
-        columns: Vec<PyReader>,
-        size_hint: Option<usize>,
-        n_rows: Option<usize>,
-    ) -> Self {
+    fn new_source(columns: Vec<PyReader>, size_hint: Option<usize>, n_rows: Option<usize>) -> Self {
         let n_rows = n_rows.unwrap_or(usize::MAX);
         let size_hint = size_hint.unwrap_or(10);
 
@@ -128,14 +123,9 @@ pub struct SeqSource {
 
 #[pymethods]
 impl SeqSource {
-
     #[new]
     #[pyo3(signature = (columns, size_hint, n_rows))]
-    fn new_source(
-        columns: Vec<PySeq>,
-        size_hint: Option<usize>,
-        n_rows: Option<usize>,
-    ) -> Self {
+    fn new_source(columns: Vec<PySeq>, size_hint: Option<usize>, n_rows: Option<usize>) -> Self {
         let n_rows = n_rows.unwrap_or(usize::MAX);
         let size_hint = size_hint.unwrap_or(10);
 
@@ -333,11 +323,14 @@ fn io_plugin(m: &Bound<PyModule>) -> PyResult<()> {
     m.add_class::<RandomSource>().unwrap();
     m.add_class::<PySampler>().unwrap();
     let _ = m.add_wrapped(wrap_pyfunction!(readers::new_reader));
-    let _ = m.add_wrapped(wrap_pyfunction!(fibonacci::new_fibonacci))
+    let _ = m
+        .add_wrapped(wrap_pyfunction!(fibonacci::new_fibonacci))
         .unwrap();
-    let _ = m.add_wrapped(wrap_pyfunction!(samplers::new_bernoulli))
+    let _ = m
+        .add_wrapped(wrap_pyfunction!(samplers::new_bernoulli))
         .unwrap();
-    let _ = m.add_wrapped(wrap_pyfunction!(samplers::new_uniform))
+    let _ = m
+        .add_wrapped(wrap_pyfunction!(samplers::new_uniform))
         .unwrap();
 
     Ok(())

@@ -6,9 +6,7 @@ use std::sync::Mutex;
 
 #[pyclass]
 #[derive(Clone)]
-pub struct PySeq(
-    pub Arc<Mutex<Box<dyn SeqProducer>>>,
-);
+pub struct PySeq(pub Arc<Mutex<Box<dyn SeqProducer>>>);
 
 pub trait SeqProducer: Send {
     fn name(&self) -> &str;
@@ -49,15 +47,19 @@ impl SeqProducer for FibonacciProducer {
         out.push(self.last_two[1]);
 
         // Calculate and push the next n-2, since we already pushed 2 above
-        for _ in 0..n-2 {
-            let next = self.last_two[0].checked_add(self.last_two[1]).unwrap_or(self.last_two[1]);
+        for _ in 0..n - 2 {
+            let next = self.last_two[0]
+                .checked_add(self.last_two[1])
+                .unwrap_or(self.last_two[1]);
             out.push(next);
             self.last_two = [self.last_two[1], next];
         }
 
         // Calculate next two numbers that occupy last_two, for future purposes
         for _ in 0..2 {
-            let next = self.last_two[0].checked_add(self.last_two[1]).unwrap_or(self.last_two[1]);
+            let next = self.last_two[0]
+                .checked_add(self.last_two[1])
+                .unwrap_or(self.last_two[1]);
             self.last_two = [self.last_two[1], next];
         }
 
@@ -70,4 +72,3 @@ pub fn new_fibonacci(name: String, first: i64, second: i64) -> PySeq {
     let res = Box::new(new_fib_impl(name, first, second)) as Box<dyn SeqProducer>;
     PySeq(Arc::new(Mutex::new(res)))
 }
-
