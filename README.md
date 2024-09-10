@@ -48,6 +48,7 @@ python run.py /etc/os-release
 ```
 
 ```
+--- Fibonacci sequence plugin ---
 lf.head(10).collect():
 shape: (10, 2)
 ┌─────────┬─────────┐
@@ -86,6 +87,7 @@ shape: (10, 2)
 │ 6765    ┆ -6765   │
 └─────────┴─────────┘
 
+--- Line reader plugin ---
 lf.head(10).collect():
 shape: (11, 1)
 ┌─────────────────────────────────────────────────────────────────────────┐

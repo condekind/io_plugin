@@ -35,6 +35,7 @@ lf = scan_sequence(
 #lf = lf.filter(pl.col("fib_pos") > 10)
 
 print()
+print("--- Fibonacci sequence plugin ---")
 print("lf.head(10).collect():")
 print(lf.head(10).collect())
 print()
@@ -56,5 +57,6 @@ with pl.Config(
     tbl_rows=1000,
 ):
     print()
+    print("--- Line reader plugin ---")
     print("lf.head(10).collect():")
     print(lf.head(10).collect())
