@@ -58,5 +58,5 @@ with pl.Config(
 ):
     print()
     print("--- Line reader plugin ---")
-    print("lf.head(10).collect():")
-    print(lf.head(10).collect())
+    print("lf.head(3).collect():")
+    print(lf.head(3).collect())

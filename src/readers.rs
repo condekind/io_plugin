@@ -2,7 +2,6 @@ use polars::prelude::*;
 use pyo3::{pyclass, pyfunction};
 use pyo3_polars::export::polars_core::datatypes::DataType;
 use pyo3_polars::export::polars_core::prelude::Series;
-use std::error::Error;
 use std::fs::File;
 use std::io;
 use std::io::BufRead;
@@ -48,14 +47,20 @@ impl FileReader for LineReader {
 
         let path = Path::new(&self.file_path);
 
+        let mut cnt = 0usize;
+
         match File::open(path) {
             Ok(file) => {
                 let reader = io::BufReader::new(file);
                 for line in reader.lines() {
+                    if cnt == n {
+                        break
+                    }
                     match line {
                         Ok(line) => {
                             let line = line.trim().to_string();
                             out.push(line);
+                            cnt += 1;
                         }
                         Err(e) => {
                             eprintln!("Error reading line: {}", e);
