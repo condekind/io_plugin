@@ -34,19 +34,18 @@ lf = scan_sequence(
 ## Don't
 #lf = lf.filter(pl.col("fib_pos") > 10)
 
-print()
-print("--- Fibonacci sequence plugin ---")
-print("lf.head(10).collect():")
-print(lf.head(10).collect())
-print()
-print("lf.head(10).collect():")
-print(lf.head(10).collect())
+#print()
+#print("--- Fibonacci sequence plugin ---")
+#print("lf.head(10).collect():")
+#print(lf.head(10).collect())
+#print()
+#print("lf.head(10).collect():")
+#print(lf.head(10).collect())
 
 
 lf = scan_files(
     [
-        new_reader("/etc/os-release", sys.argv[1] if len(sys.argv) > 1 else "/dev/null"),
-        new_reader("/etc/fstab", sys.argv[2] if len(sys.argv) > 2 else "/dev/null"),
+        new_reader("first", sys.argv[1] if len(sys.argv) > 1 else "/dev/null"),
     ]
 )
 
@@ -58,4 +57,4 @@ with pl.Config(
     print()
     print("--- Line reader plugin ---")
     print("lf.head(3).collect():")
-    print(lf.head(3).collect())
+    print(lf.head().collect())

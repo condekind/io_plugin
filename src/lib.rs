@@ -78,6 +78,19 @@ impl ReaderSource {
                 Box::new(self.columns.iter())
             };
 
+            /*
+            let columns = s_iter
+                .flat_map(|s| {
+                    let mut s = s.0.lock().unwrap();
+
+                    // Apply slice pushdown.
+                    // This prevents unneeded sampling.
+                    s.next_n(std::cmp::min(self.size_hint, self.n_rows))
+                })
+                .collect::<Vec<_>>();
+            */
+
+            ///*
             let columns = s_iter
                 .map(|s| {
                     let mut s = s.0.lock().unwrap();
@@ -87,10 +100,13 @@ impl ReaderSource {
                     s.next_n(std::cmp::min(self.size_hint, self.n_rows))
                 })
                 .collect::<Vec<_>>();
+            //*/
 
             dbg!(&columns.len());
 
-            let mut df = DataFrame::new(columns).map_err(PyPolarsErr::from)?;
+            let mut df = DataFrame::new(columns[0].clone()).map_err(PyPolarsErr::from)?;
+
+            //let mut df = DataFrame::new(columns).map_err(PyPolarsErr::from)?;
             self.n_rows = self.n_rows.saturating_sub(self.size_hint);
 
             // Apply predicate pushdown.

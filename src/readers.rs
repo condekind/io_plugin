@@ -17,7 +17,7 @@ pub trait FileReader: Send {
 
     fn dtype(&self) -> DataType;
 
-    fn next_n(&mut self, n: usize) -> Series;
+    fn next_n(&mut self, n: usize) -> Vec<Series>;
 }
 
 struct LineReader {
@@ -41,9 +41,9 @@ impl FileReader for LineReader {
         return DataType::String;
     }
 
-    fn next_n(&mut self, n: usize) -> Series {
+    fn next_n(&mut self, n: usize) -> Vec<Series> {
         // Output/result vector
-        let mut out: Vec<String> = Vec::with_capacity(n);
+        let mut out: Vec<Vec<String>> = Vec::new();
 
         let path = Path::new(&self.file_path);
 
@@ -53,17 +53,53 @@ impl FileReader for LineReader {
             Ok(file) => {
                 let reader = io::BufReader::new(file);
                 for line in reader.lines() {
-                    if cnt == n {
-                        break
+
+                    // On zero we initialize `out`, on `n` we break
+                    if cnt == 0usize {
+                        // Split first line to decide how many Vecs `out` will contain
+                        let split_line = match &line {
+                            Ok(l) => l.split(',').collect::<Vec<&str>>(),
+                            Err(e) => {
+                                println!("Error reading line #0: {}", e);
+                                Vec::new()
+                            },
+                        };
+                        for _ in 0usize..split_line.len() {
+                            out.push(Vec::new());
+                        };
+                    } else if cnt == n {
+                        // If we already read n lines, stop
+                        break;
                     }
+
                     match line {
                         Ok(line) => {
-                            let line = line.trim().to_string();
-                            out.push(line);
+                            let fields = line.split(',').collect::<Vec<&str>>();
+                            if fields.len() != out.len() {
+                                println!("(WW): Line #{cnt} doesn't have the same num. of fields than line #0");
+                                let mut fill = fields.len();
+                                while fill < out.len() {
+                                    out[fill].push(String::from("MISSING"));
+                                    fill += 1;
+                                }
+                            }
+
+                            for idx in 0usize..fields.len() {
+
+                                if idx >= out.len() {
+                                    println!("(WW): Line #{cnt} has more fields than line #0");
+                                    break;
+                                }
+
+                                // Push idx-th line to idx-th Vec in `out`
+                                out[idx].push(fields[idx].parse().unwrap());
+                            }
+
                             cnt += 1;
                         }
                         Err(e) => {
                             eprintln!("Error reading line: {}", e);
+                            cnt += 1;
                         }
                     }
                 }
@@ -73,7 +109,11 @@ impl FileReader for LineReader {
             }
         }
 
-        Series::new(self.name().into(), out)
+        let mut res: Vec<Series> = Vec::new();
+        for (idx, v) in out.iter().enumerate() {
+            res.push(Series::new(idx.to_string().as_str().into(), v));
+        }
+        res
     }
 }
 
