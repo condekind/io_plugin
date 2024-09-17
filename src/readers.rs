@@ -73,7 +73,7 @@ impl FileReader for LineReader {
             }
         }
 
-        Series::new(self.name(), out)
+        Series::new(self.name().into(), out)
     }
 }
 

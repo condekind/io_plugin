@@ -42,7 +42,7 @@ impl ReaderSource {
             .iter()
             .map(|s| {
                 let s = s.0.lock().unwrap();
-                Field::new(s.name(), s.dtype())
+                Field::new(s.name().into(), s.dtype())
             })
             .collect::<Schema>();
         PySchema(Arc::new(schema))
@@ -87,6 +87,8 @@ impl ReaderSource {
                     s.next_n(std::cmp::min(self.size_hint, self.n_rows))
                 })
                 .collect::<Vec<_>>();
+
+            dbg!(&columns.len());
 
             let mut df = DataFrame::new(columns).map_err(PyPolarsErr::from)?;
             self.n_rows = self.n_rows.saturating_sub(self.size_hint);
@@ -144,7 +146,7 @@ impl SeqSource {
             .iter()
             .map(|s| {
                 let s = s.0.lock().unwrap();
-                Field::new(s.name(), s.dtype())
+                Field::new(s.name().into(), s.dtype())
             })
             .collect::<Schema>();
         PySchema(Arc::new(schema))
@@ -248,7 +250,7 @@ impl RandomSource {
             .iter()
             .map(|s| {
                 let s = s.0.lock().unwrap();
-                Field::new(s.name(), s.dtype())
+                Field::new(s.name().into(), s.dtype())
             })
             .collect::<Schema>();
         PySchema(Arc::new(schema))

@@ -63,7 +63,7 @@ impl SeqProducer for FibonacciProducer {
             self.last_two = [self.last_two[1], next];
         }
 
-        Series::from_vec(self.name(), out)
+        Series::from_vec(self.name().into(), out)
     }
 }
 

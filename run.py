@@ -45,11 +45,10 @@ print(lf.head(10).collect())
 
 lf = scan_files(
     [
-        new_reader("lines", sys.argv[1] if len(sys.argv) > 1 else "/dev/null"),
+        new_reader("/etc/os-release", sys.argv[1] if len(sys.argv) > 1 else "/dev/null"),
+        new_reader("/etc/fstab", sys.argv[2] if len(sys.argv) > 2 else "/dev/null"),
     ]
 )
-
-#lf = lf.filter(pl.col("fib_pos") > 10)
 
 with pl.Config(
     fmt_str_lengths=1000,
